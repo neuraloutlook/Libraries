@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.couchbase.client</groupId>
+    <artifactId>couchbase-jvm-clients</artifactId>
+    <version>1.17.1</version><!--REL-->
+    <packaging>pom</packaging>
+
+    <name>Couchbase JVM Client Parent</name>
+    <description>Parent POM for Couchbase JVM projects</description>
+
+    <properties>
+        <maven.compiler.release>8</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <osgi-feature.version>3.8.1</osgi-feature.version><!--REL-->
+        <java-examples.version>1.8.1</java-examples.version><!--REL-->
+        <java-client.version>3.8.1</java-client.version><!--REL-->
+        <core-io.version>3.8.1</core-io.version><!--REL-->
+        <core-io-deps.version>1.8.1</core-io-deps.version><!--REL-->
+        <scala-client.version>1.8.1</scala-client.version><!--REL-->
+        <kotlin-client.version>1.5.1</kotlin-client.version><!--REL-->
+        <columnar-java-client.version>1.1.1</columnar-java-client.version><!--REL-->
+        <tracing-opentelemetry.version>1.6.1</tracing-opentelemetry.version><!--REL-->
+        <metrics-opentelemetry.version>0.8.1</metrics-opentelemetry.version><!--REL-->
+        <test-utils.version>1.8.1</test-utils.version><!--REL-->
+
+        <junit.version>5.11.2</junit.version>
+        <assertj.version>3.23.1</assertj.version>
+        <log4j-slf4j-impl.version>2.20.0</log4j-slf4j-impl.version>
+
+        <jackson.version>2.17.2</jackson.version>
+        <reactor.version>3.6.9</reactor.version>
+        <reactive-streams.version>1.0.4</reactive-streams.version>
+        <blockhound.version>1.0.10.RELEASE</blockhound.version>
+        <micrometer.version>1.12.9</micrometer.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <karaf.version>4.4.3</karaf.version>
+        <!-- Logback 1.3 still supports Java 8 (1.4 doesn't), but requires a jump to SLF4J 2.X -->
+        <logback.version>1.2.11</logback.version>
+        <gson.version>2.9.1</gson.version>
+
+        <!-- This project has been sunset and 0.8.0 is the final version -->
+        <scala.reactor-core-extensions.version>0.8.0</scala.reactor-core-extensions.version>
+        <scala.circe.version>0.14.10</scala.circe.version>
+        <!-- Next version 2.10.0 dropped support for Java 8 -->
+        <scala.play-json.version>2.9.4</scala.play-json.version>
+        <!-- "The v2.13.5.2 release is the last version that supports JDK 8+" -->
+        <scala.jsoniter-scala.version>2.13.5.2</scala.jsoniter-scala.version>
+        <scala.jsoniter.version>0.9.23</scala.jsoniter.version>
+        <!-- json4s has long since moved to 4.x, but this would be a breaking change for us.  3.6.12 was the last stable (non-M) 3.x release -->
+        <scala.json4s.version>3.6.12</scala.json4s.version>
+        <scala.jawn.version>1.6.0</scala.jawn.version>
+        <!-- 3.3.1 is the final version of the 3.x family, with 4.0 introducing breaking changes -->
+        <scala.upickle.version>3.3.1</scala.upickle.version>
+        <scala.collection-compat.version>2.12.0</scala.collection-compat.version>
+
+        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
+        <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
+        <scala-maven-plugin.version>4.8.1</scala-maven-plugin.version>
+        <mvn-scalafmt.version>1.1.1684076452.9f83818</mvn-scalafmt.version>
+
+        <!-- When changing this, make sure to update these versions:
+            tracing-opentelemetry-deps/pom.xml opentelemetry-grpc-1.6
+            tracing-opentelemetry/pom.xml opentelemetry-instrumentation-api-semconv
+
+            Those require alpha releases, and due to limitations with older Maven versions, they cannot
+            use "${opentelemetry.version}-alpha" -->
+        <opentelemetry.version>1.31.0</opentelemetry.version>
+
+        <gpg.keyname></gpg.keyname>
+        <gpg.passphrase></gpg.passphrase>
+        <!-- Required to stop the exec-maven-plugin complaining  -->
+        <exec.mainClass>none</exec.mainClass>
+    </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>core-io</artifactId>
+                <version>${core-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>java-client</artifactId>
+                <version>${java-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>scala-implicits_2.12</artifactId>
+                <version>${scala-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>scala-client_2.12</artifactId>
+                <version>${scala-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>scala-implicits_2.13</artifactId>
+                <version>${scala-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>scala-client_2.13</artifactId>
+                <version>${scala-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>kotlin-client</artifactId>
+                <version>${kotlin-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>couchbase-columnar-java-client</artifactId>
+                <version>${columnar-java-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>test-utils</artifactId>
+                <version>${test-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>tracing-opentelemetry</artifactId>
+                <version>${tracing-opentelemetry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.couchbase.client</groupId>
+                <artifactId>metrics-opentelemetry</artifactId>
+                <version>${metrics-opentelemetry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor.tools</groupId>
+                <artifactId>blockhound</artifactId>
+                <version>${blockhound.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <url>https://couchbase.com</url>
+    <organization>
+        <name>Couchbase, Inc.</name>
+        <url>https://couchbase.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>daschl</id>
+            <name>Michael Nitschinger</name>
+            <email>michael.nitschinger@couchbase.com</email>
+        </developer>
+        <developer>
+            <id>programmatix</id>
+            <name>Graham Pople</name>
+            <email>graham.pople@couchbase.com</email>
+        </developer>
+        <developer>
+            <id>dnault</id>
+            <name>David Nault</name>
+            <email>david.nault@couchbase.com</email>
+        </developer>
+        <developer>
+            <id>avsej</id>
+            <name>Sergey Avseyev</name>
+            <email>sergey@couchbase.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git://github.com/couchbase/couchbase-jvm-clients</connection>
+        <developerConnection>scm:git:git://github.com/couchbase/couchbase-jvm-clients</developerConnection>
+        <url>https://github.com/couchbase/couchbase-jvm-clients</url>
+    </scm>
+
+    <modules>
+        <module>java-client</module>
+        <module>osgi-feature</module>
+        <module>java-examples</module>
+        <module>core-io</module>
+        <module>scala-implicits</module>
+        <module>scala-client</module>
+        <module>kotlin-client</module>
+        <module>test-utils</module>
+        <module>tracing-micrometer-observation</module>
+        <module>tracing-opentracing</module>
+        <module>tracing-opentelemetry</module>
+        <module>metrics-opentelemetry</module>
+        <module>metrics-micrometer</module>
+        <module>columnar-java-client</module>
+        <!-- Uncomment next lines to include the FIT performers.  They are not included by default as they require
+        a) an externally built lib and b) JDK 17 -->
+<!--         <module>core-fit-performer</module>-->
+<!--         <module>java-fit-performer</module>-->
+<!--         <module>kotlin-fit-performer</module>-->
+<!--         <module>scala-fit-performer</module>-->
+<!--         <module>columnar-fit-performer-shared</module>-->
+<!--         <module>columnar-java-fit-performer</module>-->
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <shortRevisionLength>8</shortRevisionLength>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <includes>
+                        <include>**/*.scala</include>
+                        <include>**/*Spec.class</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludedGroups>flaky</excludedGroups>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <!-- Last version to support Java 8 is 9.x -->
+                        <version>9.3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <headerLocation>config/checkstyle/checkstyle-header.txt</headerLocation>
+                    <configLocation>config/checkstyle/checkstyle-basic.xml</configLocation>
+                    <suppressionsLocation>config/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Want java-fit-performer to be executable.  Maven complains if use exec:java target as the dependencies of
+              module aren't executable.  The workaround appears to be this - disable execution by default. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <configuration>
+                    <skip>true</skip>
+                    <executable>java</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>CI</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+<!-- version changing -->
+<!--
+
+Remove -SNAPSHOT
+find . -iname "pom.xml" -exec  sed -ie 's/\(-SNAPSHOT\)\(<\/.*><\!\-\-REL\-\->\)/\2/' {} \;
+
+Insert  -SNAPSHOT, afterwards, manually change the versions preceding -SNAPSHOT
+find . -iname "pom.xml" -exec  sed -ie 's/\(<\/[^>]*><\!\-\-REL\-\->\)/\-SNAPSHOT\1/' {} \;
+
+- or -
+
+Change version from 3 to 4 and insert -SNAPSHOT.  The last 2 references the second search pattern group.
+
+find . -iname "pom.xml" -exec  sed -ie 's/\(3\)\(<\/[^>]*><\!\-\-REL\-\->\)/4\-SNAPSHOT\2/' {} \;
+
+# check with
+git diff | grep '^+ '  | grep -v '\.4-SNAPSHOT'
+-->
+
+</project>
